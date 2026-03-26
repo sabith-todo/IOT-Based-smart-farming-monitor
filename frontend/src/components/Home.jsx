@@ -132,11 +132,11 @@ const Home = () => {
               showCard(
                 'Live Weather Monitoring',
                 'The system retrieves real-time weather data such as temperature and humidity to help users understand changing environmental conditions and react quickly.',
-                '/img/16.jpg'
+                '/img/3.jpeg'
               )
             }
           >
-            <img src="/img/16.jpg" alt="Weather" />
+            <img src="/img/3.jpeg" alt="Weather" />
             <h3>Live Weather Data</h3>
             <p>Track temperature and humidity in real time.</p>
           </div>
@@ -147,11 +147,11 @@ const Home = () => {
               showCard(
                 'Satellite Map Integration',
                 'The project uses a real satellite map to display farm locations and marked monitoring points for digital field observation and intelligent land tracking.',
-                '/img/17.jpg'
+                '/img/4.jpeg'
               )
             }
           >
-            <img src="/img/17.jpg" alt="Map" />
+            <img src="/img/4.jpeg" alt="Map" />
             <h3>Satellite Map View</h3>
             <p>Visualize farm areas through real map display.</p>
           </div>
@@ -162,11 +162,11 @@ const Home = () => {
               showCard(
                 'Soil Analysis Simulation',
                 'The software simulates soil moisture and pH values to provide farming insights even without physical hardware sensors.',
-                '/img/18.jpg'
+                '/img/5.jpeg'
               )
             }
           >
-            <img src="/img/18.jpg" alt="Soil" />
+            <img src="/img/5.jpeg" alt="Soil" />
             <h3>Soil Condition Analysis</h3>
             <p>Monitor moisture and pH using software simulation.</p>
           </div>
@@ -177,11 +177,11 @@ const Home = () => {
               showCard(
                 'Smart Alerts',
                 'The system generates warning messages for high temperature, low soil moisture, and pH imbalance, helping the user respond faster.',
-                '/img/19.jpg'
+                '/img/6.jpeg'
               )
             }
           >
-            <img src="/img/19.jpg" alt="Alerts" />
+            <img src="/img/6.jpeg" alt="Alerts" />
             <h3>Intelligent Alerts</h3>
             <p>Receive fast warnings when farm conditions change.</p>
           </div>
@@ -201,11 +201,11 @@ const Home = () => {
               showCard(
                 'Data Collection',
                 'The application collects location-based weather information using APIs and combines it with simulated farming parameters like moisture and pH.',
-                '/img/19.jpg'
+                '/img/7.jpeg'
               )
             }
           >
-            <img src="/img/19.jpg" alt="Collection" />
+            <img src="/img/7.jpeg" alt="Collection" />
             <h3>1. Collect Data</h3>
             <p>Fetch weather values and generate farm-related inputs.</p>
           </div>
@@ -216,11 +216,11 @@ const Home = () => {
               showCard(
                 'Data Processing',
                 'The system processes temperature, humidity, moisture, and pH to generate warnings, crop suggestions, and real-time dashboard values.',
-                '/img/20.jpg'
+                '/img/8.jpeg'
               )
             }
           >
-            <img src="/img/20.jpg" alt="Processing" />
+            <img src="/img/8.jpeg" alt="Processing" />
             <h3>2. Process Data</h3>
             <p>Analyze live and simulated values intelligently.</p>
           </div>
@@ -231,11 +231,11 @@ const Home = () => {
               showCard(
                 'User Output',
                 'The user sees all outputs in the dashboard as cards, map markers, smart status messages, charts, and archive records.',
-                '/img/21.jpg'
+                '/img/9.jpeg'
               )
             }
           >
-            <img src="/img/21.jpg" alt="Output" />
+            <img src="/img/9.jpeg" alt="Output" />
             <h3>3. Display Results</h3>
             <p>Show smart results through dashboard and charts.</p>
           </div>

@@ -174,6 +174,7 @@ app.post('/api/readings', async (req, res) => {
         message: 'deviceId is required',
       });
     }
+    
 
     const newRecord = new FarmRecord({
       userEmail: 'poller@system.local',

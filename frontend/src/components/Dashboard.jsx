@@ -14,6 +14,7 @@ import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import L from 'leaflet';
 import FrequencyDashboard from './FrequencyDashboard';
+import LiveWeatherPage from './LiveWeatherPage';
 
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free';
@@ -42,6 +43,50 @@ const DEFAULT_SCAN = {
   rainChance: 0,
   irrigation: 'Not Required',
   autoIrrigation: 'OFF',
+};
+
+const DEFAULT_WEATHER_PANEL = {
+  city: 'Unknown',
+  country: '',
+  condition: 'N/A',
+  description: 'No data',
+  icon: '☁️',
+  temp: '--',
+  tempMin: '--',
+  tempMax: '--',
+  feelsLike: '--',
+  humidity: '--',
+  wind: '--',
+  pressure: '--',
+  sunrise: '--',
+  sunset: '--',
+  forecast: [],
+  alerts: [],
+  updatedAt: '--',
+};
+
+const conditionToIcon = (condition) => {
+  const c = String(condition || '').toLowerCase();
+  if (c.includes('thunder')) return '⛈️';
+  if (c.includes('rain')) return '🌧️';
+  if (c.includes('cloud')) return '☁️';
+  if (c.includes('clear')) return '☀️';
+  if (c.includes('snow')) return '❄️';
+  if (c.includes('mist') || c.includes('fog') || c.includes('haze')) return '🌫️';
+  return '⛅';
+};
+
+const formatTime = (unixSeconds) => {
+  if (!unixSeconds) return '--';
+  return new Date(unixSeconds * 1000).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+const kelvinToC = (value) => {
+  if (value === undefined || value === null) return '--';
+  return (Number(value) - 273.15).toFixed(1);
 };
 
 const downloadSessionData = (history) => {
@@ -532,6 +577,288 @@ const WeatherIntelligencePage = ({ history }) => {
   );
 };
 
+// const LiveWeatherPage = ({ gps, weatherPanel, weatherLoading, refreshLiveWeather }) => {
+//   const [liveClock, setLiveClock] = useState(new Date());
+
+//   useEffect(() => {
+//     const timer = setInterval(() => setLiveClock(new Date()), 1000);
+//     return () => clearInterval(timer);
+//   }, []);
+
+//   const today = liveClock.toLocaleDateString([], {
+//     weekday: 'long',
+//     month: 'short',
+//     day: 'numeric',
+//   });
+
+//   const timeNow = liveClock.toLocaleTimeString([], {
+//     hour: '2-digit',
+//     minute: '2-digit',
+//   });
+
+//   return (
+//     <div className="page-card" style={{ padding: 0, overflow: 'hidden' }}>
+//       <div
+//         className="weather-split"
+//         style={{
+//           minHeight: '78vh',
+//           background:
+//             'linear-gradient(135deg, rgba(2,6,23,0.98), rgba(15,23,42,0.96), rgba(30,41,59,0.96))',
+//           display: 'grid',
+//           gridTemplateColumns: '1.4fr 220px',
+//         }}
+//       >
+//         <div style={{ padding: '26px', position: 'relative' }}>
+//           <div
+//             style={{
+//               background: 'linear-gradient(135deg, rgba(15,23,42,0.88), rgba(30,41,59,0.75))',
+//               border: '1px solid rgba(255,255,255,0.08)',
+//               borderRadius: '22px',
+//               padding: '22px',
+//               boxShadow: '0 20px 60px rgba(0,0,0,0.35)',
+//             }}
+//           >
+//             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' }}>
+//               <div>
+//                 <div style={{ color: '#cbd5e1', fontSize: '14px', marginBottom: '8px' }}>
+//                   📍 {weatherPanel.city}{weatherPanel.country ? `, ${weatherPanel.country}` : ''}
+//                 </div>
+//                 <div style={{ fontSize: '20px', color: '#e2e8f0', marginBottom: '6px' }}>{today}</div>
+//                 <div style={{ fontSize: '52px', fontWeight: 800, color: '#ffffff' }}>{timeNow}</div>
+//               </div>
+
+//               <div style={{ textAlign: 'right' }}>
+//                 <div style={{ fontSize: '58px', marginBottom: '6px' }}>{weatherPanel.icon}</div>
+//                 <div style={{ fontSize: '18px', color: '#e2e8f0', textTransform: 'capitalize' }}>
+//                   {weatherPanel.condition}
+//                 </div>
+//                 <div style={{ color: '#94a3b8', fontSize: '14px' }}>{weatherPanel.description}</div>
+//               </div>
+//             </div>
+
+//             <div
+//               style={{
+//                 marginTop: '20px',
+//                 display: 'grid',
+//                 gridTemplateColumns: '1.2fr 1fr',
+//                 gap: '18px',
+//               }}
+//             >
+//               <div
+//                 style={{
+//                   background: 'rgba(0,0,0,0.18)',
+//                   border: '1px solid rgba(255,255,255,0.08)',
+//                   borderRadius: '18px',
+//                   padding: '18px',
+//                 }}
+//               >
+//                 <div style={{ fontSize: '72px', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
+//                   {weatherPanel.temp}°C
+//                 </div>
+//                 <div style={{ marginTop: '8px', color: '#cbd5e1', fontSize: '15px' }}>
+//                   H: {weatherPanel.tempMax}°C &nbsp; | &nbsp; L: {weatherPanel.tempMin}°C
+//                 </div>
+//                 <div style={{ marginTop: '12px', color: '#94a3b8', fontSize: '15px' }}>
+//                   Feels like {weatherPanel.feelsLike}°C
+//                 </div>
+//               </div>
+
+//               <div
+//                 style={{
+//                   background: 'rgba(0,0,0,0.18)',
+//                   border: '1px solid rgba(255,255,255,0.08)',
+//                   borderRadius: '18px',
+//                   padding: '18px',
+//                   display: 'grid',
+//                   gridTemplateColumns: '1fr 1fr',
+//                   gap: '12px',
+//                 }}
+//               >
+//                 <div>
+//                   <div style={{ color: '#94a3b8', fontSize: '12px' }}>Humidity</div>
+//                   <div style={{ color: '#fff', fontSize: '24px', fontWeight: 700 }}>{weatherPanel.humidity}%</div>
+//                 </div>
+//                 <div>
+//                   <div style={{ color: '#94a3b8', fontSize: '12px' }}>Wind</div>
+//                   <div style={{ color: '#fff', fontSize: '24px', fontWeight: 700 }}>{weatherPanel.wind}</div>
+//                 </div>
+//                 <div>
+//                   <div style={{ color: '#94a3b8', fontSize: '12px' }}>Sunrise</div>
+//                   <div style={{ color: '#fff', fontSize: '20px', fontWeight: 700 }}>{weatherPanel.sunrise}</div>
+//                 </div>
+//                 <div>
+//                   <div style={{ color: '#94a3b8', fontSize: '12px' }}>Sunset</div>
+//                   <div style={{ color: '#fff', fontSize: '20px', fontWeight: 700 }}>{weatherPanel.sunset}</div>
+//                 </div>
+//               </div>
+//             </div>
+
+//             <div style={{ marginTop: '22px' }}>
+//               <div style={{ color: '#e2e8f0', fontSize: '18px', fontWeight: 700, marginBottom: '14px' }}>
+//                 Forecast Snapshot
+//               </div>
+
+//               <div
+//                 style={{
+//                   display: 'grid',
+//                   gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+//                   gap: '12px',
+//                 }}
+//               >
+//                 {weatherPanel.forecast.length === 0 ? (
+//                   <div style={{ color: '#94a3b8' }}>No forecast data available</div>
+//                 ) : (
+//                   weatherPanel.forecast.map((item, index) => (
+//                     <div
+//                       key={`${item.day}-${index}`}
+//                       style={{
+//                         background: 'rgba(255,255,255,0.05)',
+//                         border: '1px solid rgba(255,255,255,0.08)',
+//                         borderRadius: '16px',
+//                         padding: '14px',
+//                         textAlign: 'center',
+//                       }}
+//                     >
+//                       <div style={{ color: '#cbd5e1', fontSize: '13px', marginBottom: '8px' }}>{item.day}</div>
+//                       <div style={{ fontSize: '28px', marginBottom: '6px' }}>{item.icon}</div>
+//                       <div style={{ color: '#fff', fontWeight: 700 }}>{item.temp}°C</div>
+//                       <div style={{ color: '#94a3b8', fontSize: '12px' }}>{item.label}</div>
+//                     </div>
+//                   ))
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+//         <div
+//           style={{
+//             padding: '24px 18px',
+//             borderLeft: '1px solid rgba(255,255,255,0.08)',
+//             display: 'flex',
+//             flexDirection: 'column',
+//             gap: '18px',
+//             background: 'rgba(2,6,23,0.45)',
+//           }}
+//         >
+//           <div style={{ textAlign: 'center', marginBottom: '6px' }}>
+//             <button
+//               onClick={refreshLiveWeather}
+//               style={{
+//                 background: '#2563eb',
+//                 color: '#fff',
+//                 border: 'none',
+//                 borderRadius: '12px',
+//                 padding: '10px 16px',
+//                 fontWeight: 700,
+//                 cursor: 'pointer',
+//               }}
+//             >
+//               {weatherLoading ? 'Loading...' : 'Refresh Weather'}
+//             </button>
+//           </div>
+
+//           <div style={weatherSidebarItemStyle}>
+//             <div style={weatherSidebarIcon}>🌦️</div>
+//             <div>
+//               <div style={weatherSidebarTitle}>Weather</div>
+//               <div style={weatherSidebarSub}>{weatherPanel.condition}</div>
+//             </div>
+//           </div>
+
+//           <div style={weatherSidebarItemStyle}>
+//             <div style={weatherSidebarIcon}>🚨</div>
+//             <div>
+//               <div style={weatherSidebarTitle}>Alert</div>
+//               <div style={weatherSidebarSub}>
+//                 {weatherPanel.alerts.length > 0 ? weatherPanel.alerts[0] : 'No major alerts'}
+//               </div>
+//             </div>
+//           </div>
+
+//           <div style={weatherSidebarItemStyle}>
+//             <div style={weatherSidebarIcon}>🕒</div>
+//             <div>
+//               <div style={weatherSidebarTitle}>Time</div>
+//               <div style={weatherSidebarSub}>{timeNow}</div>
+//             </div>
+//           </div>
+
+//           <div style={weatherSidebarItemStyle}>
+//             <div style={weatherSidebarIcon}>📍</div>
+//             <div>
+//               <div style={weatherSidebarTitle}>City</div>
+//               <div style={weatherSidebarSub}>
+//                 {weatherPanel.city}
+//                 {gps ? ` (${gps.lat.toFixed(2)}, ${gps.lon.toFixed(2)})` : ''}
+//               </div>
+//             </div>
+//           </div>
+
+//           <div
+//             style={{
+//               marginTop: '12px',
+//               background: 'rgba(255,255,255,0.05)',
+//               border: '1px solid rgba(255,255,255,0.08)',
+//               borderRadius: '16px',
+//               padding: '14px',
+//             }}
+//           >
+//             <div style={{ color: '#fff', fontWeight: 700, marginBottom: '8px' }}>Weather Alerts</div>
+//             {weatherPanel.alerts.length === 0 ? (
+//               <div style={{ color: '#94a3b8', fontSize: '13px' }}>No active weather alerts</div>
+//             ) : (
+//               weatherPanel.alerts.map((alert, index) => (
+//                 <div
+//                   key={`${alert}-${index}`}
+//                   style={{
+//                     color: '#e2e8f0',
+//                     fontSize: '13px',
+//                     padding: '8px 0',
+//                     borderBottom:
+//                       index !== weatherPanel.alerts.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+//                   }}
+//                 >
+//                   • {alert}
+//                 </div>
+//               ))
+//             )}
+//             <div style={{ color: '#64748b', fontSize: '12px', marginTop: '12px' }}>
+//               Updated: {weatherPanel.updatedAt}
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+const weatherSidebarItemStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  background: 'rgba(255,255,255,0.05)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: '16px',
+  padding: '14px',
+};
+
+const weatherSidebarIcon = {
+  fontSize: '28px',
+};
+
+const weatherSidebarTitle = {
+  color: '#ffffff',
+  fontWeight: 700,
+  marginBottom: '4px',
+};
+
+const weatherSidebarSub = {
+  color: '#94a3b8',
+  fontSize: '13px',
+  lineHeight: 1.4,
+};
+
 const WeeklyReportPage = ({ history }) => {
   const recent = history.slice(0, 7);
 
@@ -764,6 +1091,9 @@ const Dashboard = () => {
   const [autoScan, setAutoScan] = useState(false);
   const [lastUpdated, setLastUpdated] = useState('--');
 
+  const [weatherPanel, setWeatherPanel] = useState(DEFAULT_WEATHER_PANEL);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+
   const farmHealthScore = useMemo(() => {
     return Math.max(
       0,
@@ -859,6 +1189,99 @@ const Dashboard = () => {
     loadFarmData();
   }, []);
 
+  const fetchLiveWeather = async (lat, lon) => {
+    if (!lat || !lon) return;
+
+    // Replace this with your OpenWeatherMap API key if needed
+    const API_KEY = 'f74e17981f73298d2333a7e92e495df8';
+    setWeatherLoading(true);
+
+    try {
+      const currentRes = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`
+      );
+      const currentData = await currentRes.json();
+
+      const forecastRes = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}`
+      );
+      const forecastData = await forecastRes.json();
+
+      if (!currentData || !currentData.main || currentData.cod === '401') {
+        throw new Error('Invalid weather response');
+      }
+
+      const alerts = [];
+      const mainTemp = Number(kelvinToC(currentData.main.temp));
+      const mainWind = Number(currentData.wind?.speed || 0);
+      const mainHumidity = Number(currentData.main?.humidity || 0);
+
+      if (mainTemp > 38) alerts.push('Extreme heat warning');
+      if (mainWind > 10) alerts.push('Strong wind warning');
+      if ((forecastData?.list || []).some((item) => String(item.weather?.[0]?.main || '').toLowerCase().includes('rain'))) {
+        alerts.push('Rain expected in forecast');
+      }
+      if (mainHumidity > 85) alerts.push('Very high humidity');
+
+      const forecast =
+        forecastData?.list?.slice(0, 5).map((item) => ({
+          day: new Date(item.dt * 1000).toLocaleDateString([], { weekday: 'short' }),
+          temp: kelvinToC(item.main?.temp),
+          icon: conditionToIcon(item.weather?.[0]?.main),
+          label: item.weather?.[0]?.main || 'Weather',
+        })) || [];
+
+      setWeatherPanel({
+        city: currentData.name || 'Unknown',
+        country: currentData.sys?.country || '',
+        condition: currentData.weather?.[0]?.main || 'N/A',
+        description: currentData.weather?.[0]?.description || 'No description',
+        icon: conditionToIcon(currentData.weather?.[0]?.main),
+        temp: kelvinToC(currentData.main?.temp),
+        tempMin: kelvinToC(currentData.main?.temp_min),
+        tempMax: kelvinToC(currentData.main?.temp_max),
+        feelsLike: kelvinToC(currentData.main?.feels_like),
+        humidity: currentData.main?.humidity ?? '--',
+        wind: currentData.wind?.speed ?? '--',
+        pressure: currentData.main?.pressure ?? '--',
+        sunrise: formatTime(currentData.sys?.sunrise),
+        sunset: formatTime(currentData.sys?.sunset),
+        forecast,
+        alerts,
+        updatedAt: new Date().toLocaleTimeString(),
+      });
+    } catch (error) {
+      console.error('Live weather fetch failed:', error);
+      setWeatherPanel({
+        city: 'Weather API Error',
+        country: '',
+        condition: 'Unavailable',
+        description: 'Add valid OpenWeatherMap API key',
+        icon: '⚠️',
+        temp: '--',
+        tempMin: '--',
+        tempMax: '--',
+        feelsLike: '--',
+        humidity: '--',
+        wind: '--',
+        pressure: '--',
+        sunrise: '--',
+        sunset: '--',
+        forecast: [],
+        alerts: ['Unable to load live weather'],
+        updatedAt: new Date().toLocaleTimeString(),
+      });
+    } finally {
+      setWeatherLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (gps) {
+      fetchLiveWeather(gps.lat, gps.lon);
+    }
+  }, [gps]);
+
   const handleMark = async (lat, lng) => {
     const API_KEY = 'e957f7926b1e1b118a8d38e686ca308a';
     setLoading(true);
@@ -921,11 +1344,6 @@ const Dashboard = () => {
         }
       }
 
-      console.log('🌱 Moisture:', moisture);
-      console.log('🌡 Temp:', tempC.toFixed(1));
-      console.log('🌧 Rain:', rainChance);
-      console.log('💧 Irrigation Decision:', irrigation);
-
       setAlertMsg(alert);
 
       const scan = {
@@ -984,6 +1402,8 @@ const Dashboard = () => {
       } else {
         setHistory((prev) => [scan, ...prev]);
       }
+
+      fetchLiveWeather(lat, lng);
     } catch (error) {
       console.error('Fetch failed:', error);
       alert('Failed to fetch weather data. Check API key or internet.');
@@ -1247,6 +1667,12 @@ const Dashboard = () => {
           color: #6e7681;
         }
 
+        @media (max-width: 1100px) {
+          .weather-split {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
         @media (max-width: 900px) {
           .titan-v18 {
             flex-direction: column;
@@ -1268,13 +1694,14 @@ const Dashboard = () => {
         <div className="brand-box">
           <h2 style={{ color: '#58a6ff', margin: '0 0 10px 0' }}>🛰️ SMART_FARM PRO</h2>
           <div style={{ fontSize: '12px', color: '#8b949e' }}>
-            Real-time monitoring, irrigation simulation, rain intelligence, weekly reporting, and advanced analytics.
+            Real-time monitoring, irrigation simulation, rain intelligence, weekly reporting, advanced analytics, and live weather.
           </div>
         </div>
 
         <Link to="/dashboard" className="nav-btn">📊 Overview</Link>
         <Link to="/dashboard/irrigation" className="nav-btn">💧 Irrigation Control</Link>
         <Link to="/dashboard/weather" className="nav-btn">🌦 Weather Intelligence</Link>
+        <Link to="/dashboard/live-weather" className="nav-btn">⛈ Live Weather</Link>
         <Link to="/dashboard/report" className="nav-btn">📝 Weekly Report</Link>
         <Link to="/dashboard/archive" className="nav-btn">📂 Data Archive</Link>
         <Link to="/dashboard/frequency" className="nav-btn">📶 Frequency Dashboard</Link>
@@ -1292,7 +1719,7 @@ const Dashboard = () => {
         <div style={{ marginTop: 'auto', fontSize: '11px', color: '#6e7681' }}>
           MAP: {mapType.toUpperCase()}
           <br />
-          VERSION: 7.2
+          VERSION: 8.0
         </div>
       </aside>
 
@@ -1383,59 +1810,99 @@ const Dashboard = () => {
             </button>
           </div>
         </div>
+<Routes>
+  <Route
+    path="/"
+    element={
+      <OverviewPage
+        gps={gps}
+        isLocked={isLocked}
+        setIsLocked={setIsLocked}
+        loading={loading}
+        alertMsg={alertMsg}
+        mapType={mapType}
+        setMapType={setMapType}
+        history={history}
+        activeScan={activeScan}
+        handleMark={handleMark}
+        getTileLayer={getTileLayer}
+        clearAllHistory={clearAllHistory}
+        removeLastHistory={removeLastHistory}
+        drawnItemsRef={drawnItemsRef}
+        clearDrawTools={clearDrawTools}
+        mapInstanceRef={mapInstanceRef}
+        farmHealthScore={farmHealthScore}
+      />
+    }
+  />
 
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <OverviewPage
-                gps={gps}
-                isLocked={isLocked}
-                setIsLocked={setIsLocked}
-                loading={loading}
-                alertMsg={alertMsg}
-                mapType={mapType}
-                setMapType={setMapType}
-                history={history}
-                activeScan={activeScan}
-                handleMark={handleMark}
-                getTileLayer={getTileLayer}
-                clearAllHistory={clearAllHistory}
-                removeLastHistory={removeLastHistory}
-                drawnItemsRef={drawnItemsRef}
-                clearDrawTools={clearDrawTools}
-                mapInstanceRef={mapInstanceRef}
-                farmHealthScore={farmHealthScore}
-              />
-            }
-          />
-          <Route
-            path="/irrigation"
-            element={<IrrigationPage activeScan={activeScan} autoMode={autoMode} setAutoMode={setAutoMode} />}
-          />
-          <Route path="/weather" element={<WeatherIntelligencePage history={history} />} />
-          <Route path="/report" element={<WeeklyReportPage history={history} />} />
-          <Route
-            path="/archive"
-            element={
-              <ArchiveView
-                history={history}
-                deleteRecord={deleteRecord}
-                archiveSearch={archiveSearch}
-                setArchiveSearch={setArchiveSearch}
-              />
-            }
-          />
-          <Route path="/frequency" element={<FrequencyDashboard />} />
-          <Route
-            path="/advanced"
-            element={<AdvancedAnalyticsPage history={history} activeScan={activeScan} autoMode={autoMode} gps={gps} />}
-          />
-          <Route
-            path="/dashboard2"
-            element={<Dashboard2 history={history} activeScan={activeScan} gps={gps} autoMode={autoMode} />}
-          />
-        </Routes>
+  <Route
+    path="/irrigation"
+    element={
+      <IrrigationPage
+        activeScan={activeScan}
+        autoMode={autoMode}
+        setAutoMode={setAutoMode}
+      />
+    }
+  />
+
+  <Route
+    path="/weather"
+    element={<WeatherIntelligencePage history={history} />}
+  />
+
+  <Route
+    path="/live-weather"
+    element={<LiveWeatherPage gps={gps} />}
+  />
+
+  <Route
+    path="/report"
+    element={<WeeklyReportPage history={history} />}
+  />
+
+  <Route
+    path="/archive"
+    element={
+      <ArchiveView
+        history={history}
+        deleteRecord={deleteRecord}
+        archiveSearch={archiveSearch}
+        setArchiveSearch={setArchiveSearch}
+      />
+    }
+  />
+
+  <Route
+    path="/frequency"
+    element={<FrequencyDashboard />}
+  />
+
+  <Route
+    path="/advanced"
+    element={
+      <AdvancedAnalyticsPage
+        history={history}
+        activeScan={activeScan}
+        autoMode={autoMode}
+        gps={gps}
+      />
+    }
+  />
+
+  <Route
+    path="/dashboard2"
+    element={
+      <Dashboard2
+        history={history}
+        activeScan={activeScan}
+        gps={gps}
+        autoMode={autoMode}
+      />
+    }
+  />
+</Routes>
       </main>
     </div>
   );
