@@ -45,6 +45,11 @@ function App() {
           }
         />
 
+        {/* Friendly route aliases */}
+        <Route path="/plant-analysis" element={<Navigate to="/dashboard/plant-analysis" replace />} />
+        <Route path="/history" element={<Navigate to="/dashboard/history" replace />} />
+        <Route path="/irrigation" element={<Navigate to="/dashboard/irrigation" replace />} />
+
         {/* Redirect unknown routes */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -1,25 +1,33 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const PlantAnalysis = require('./models/PlantAnalysis');
 
 const app = express();
-const PORT = 4000;
-const SECRET = 'QWERTYUIOPASDFGHJKLZXCVBNM1234567890abcdefABCDEFGH';
+const PORT = process.env.PORT || 4000;
+const SECRET = process.env.JWT_SECRET || 'smartfarm_tea_aiot_secure_secret_key_2026';
 
 // =========================
 // MIDDLEWARE
 // =========================
 app.use(cors());
-app.use(express.json());
+// Allow up to 25MB for base64 tea leaf image payloads
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ limit: '25mb', extended: true }));
 
 // =========================
 // MONGODB CONNECTION
 // =========================
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/smart_farming_monitor';
+
 mongoose
-  .connect('mongodb://127.0.0.1:27017/smart_farming_monitor')
+  .connect(MONGO_URI)
   .then(() => {
     console.log('MongoDB connected successfully');
   })
@@ -56,7 +64,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 // =========================
 // FARM DATA SCHEMA
@@ -109,15 +117,27 @@ const farmRecordSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const FarmRecord = mongoose.model('FarmRecord', farmRecordSchema);
+const FarmRecord = mongoose.models.FarmRecord || mongoose.model('FarmRecord', farmRecordSchema);
 
 // =========================
-// HOME ROUTE
+// HOME & HEALTH ROUTES
 // =========================
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'Smart Farming backend is running',
+    message: 'Smart Farming AIoT backend is running',
+    version: '1.2.0',
+    service: 'Tea Plantation AIoT Suite',
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  res.json({
+    success: true,
+    status: 'healthy',
+    database: dbState === 1 ? 'connected' : dbState === 2 ? 'connecting' : 'disconnected',
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -134,10 +154,9 @@ app.get('/api/devices', async (req, res) => {
       lon: parseFloat(record.lng) || 76.9558,
       actuator: 'OFF',
       ph_baseline: parseFloat(record.ph) || 6.5,
-      name: `Device ${index + 1}`,
+      name: `Tea Zone Device ${index + 1}`,
     }));
 
-    // fallback if no records exist
     if (devices.length === 0) {
       return res.json([
         {
@@ -145,8 +164,8 @@ app.get('/api/devices', async (req, res) => {
           lat: 11.0168,
           lon: 76.9558,
           actuator: 'OFF',
-          ph_baseline: 6.5,
-          name: 'Default Device',
+          ph_baseline: 5.2,
+          name: 'Block A - Sensor Station',
         },
       ]);
     }
@@ -174,7 +193,6 @@ app.post('/api/readings', async (req, res) => {
         message: 'deviceId is required',
       });
     }
-    
 
     const newRecord = new FarmRecord({
       userEmail: 'poller@system.local',
@@ -183,8 +201,8 @@ app.post('/api/readings', async (req, res) => {
       temp: String(temperature ?? 0),
       humidity: String(humidity ?? 0),
       moisture: String(soil_moisture ?? 0),
-      ph: String(ph ?? 6.5),
-      crop: 'Auto Monitor',
+      ph: String(ph ?? 5.2),
+      crop: 'Camellia Sinensis (Tea)',
       status: `LIGHT_${light ?? 0}`,
       time: ts || new Date().toISOString(),
     });
@@ -291,9 +309,16 @@ app.post('/login', async (req, res) => {
       });
     }
 
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      SECRET,
+      { expiresIn: '7d' }
+    );
+
     res.status(200).json({
       success: true,
       message: 'Login successful',
+      token,
       user: {
         id: user._id,
         username: user.username,
@@ -317,51 +342,46 @@ app.post('/forgot-password', async (req, res) => {
   try {
     const { email, newPassword } = req.body;
 
-    // Check input
     if (!email || !newPassword) {
       return res.status(400).json({
         success: false,
-        message: 'Email and new password are required'
+        message: 'Email and new password are required',
       });
     }
 
     if (newPassword.length < 8) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 8 characters'
+        message: 'Password must be at least 8 characters',
       });
     }
 
-    // Find user
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update password
     user.password = hashedPassword;
     await user.save();
 
     res.status(200).json({
       success: true,
-      message: 'Password updated successfully ✅'
+      message: 'Password updated successfully',
     });
-
   } catch (error) {
     console.error('Forgot error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error',
     });
   }
 });
+
 // =========================
 // GET USER PROFILE
 // =========================
@@ -424,9 +444,9 @@ app.post('/farm-data', async (req, res) => {
       humidity,
       moisture,
       ph,
-      crop,
-      status,
-      time,
+      crop: crop || 'Camellia Sinensis (Tea)',
+      status: status || 'NORMAL',
+      time: time || new Date().toISOString(),
     });
 
     await newRecord.save();
@@ -489,6 +509,183 @@ app.delete('/farm-data/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Delete farm data error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete record',
+    });
+  }
+});
+
+// =========================
+// PLANT IMAGE ANALYSIS API (PHASE 1)
+// =========================
+
+// POST /api/plant-analysis - Save uploaded tea leaf specimen for analysis
+app.post('/api/plant-analysis', async (req, res) => {
+  try {
+    const {
+      userEmail,
+      title,
+      plantationBlock,
+      cultivar,
+      specimenStage,
+      imageUrl,
+      symptomsObserved,
+      notes,
+      gps,
+      status,
+      aiInferenceState,
+      expertNotes,
+    } = req.body;
+
+    if (!imageUrl) {
+      return res.status(400).json({
+        success: false,
+        message: 'Plant specimen image is required',
+      });
+    }
+
+    const newAnalysis = new PlantAnalysis({
+      userEmail: (userEmail || 'operator@plantation.local').toLowerCase(),
+      title: title || 'Tea Leaf Health Scan',
+      plantationBlock: plantationBlock || 'Block A - Camellia Sinensis (Upper Valley)',
+      cultivar: cultivar || 'Camellia sinensis var. sinensis',
+      specimenStage: specimenStage || 'Flush (Two Leaves & a Bud)',
+      imageUrl,
+      symptomsObserved: symptomsObserved || '',
+      notes: notes || '',
+      gps: gps || { lat: '11.0168', lng: '76.9558' },
+      status: status || 'Queued for Analysis',
+      aiInferenceState: aiInferenceState || 'Pending Model Service Connection',
+      expertNotes: expertNotes || '',
+      time: new Date().toISOString(),
+    });
+
+    await newAnalysis.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Specimen registered in plantation database successfully',
+      record: newAnalysis,
+    });
+  } catch (error) {
+    console.error('Save plant analysis error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to save plant analysis record',
+      error: error.message,
+    });
+  }
+});
+
+// GET /api/plant-analysis - Get all records (or query by userEmail / block / status)
+app.get('/api/plant-analysis', async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.userEmail) {
+      filter.userEmail = req.query.userEmail.toLowerCase();
+    }
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+    if (req.query.plantationBlock) {
+      filter.plantationBlock = req.query.plantationBlock;
+    }
+
+    const records = await PlantAnalysis.find(filter).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: records.length,
+      records,
+    });
+  } catch (error) {
+    console.error('Get all plant analysis error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch plant analysis records',
+    });
+  }
+});
+
+// GET /api/plant-analysis/:email - Get records for specific user email
+app.get('/api/plant-analysis/:email', async (req, res) => {
+  try {
+    const email = req.params.email.toLowerCase();
+    let records;
+    if (email === 'all' || email === 'admin') {
+      records = await PlantAnalysis.find().sort({ createdAt: -1 });
+    } else {
+      records = await PlantAnalysis.find({
+        $or: [{ userEmail: email }, { userEmail: 'operator@plantation.local' }],
+      }).sort({ createdAt: -1 });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: records.length,
+      records,
+    });
+  } catch (error) {
+    console.error('Get plant analysis by email error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch plant analysis records',
+    });
+  }
+});
+
+// PATCH /api/plant-analysis/:id/status - Update expert verification status & notes
+app.patch('/api/plant-analysis/:id/status', async (req, res) => {
+  try {
+    const { status, expertNotes, verifiedBy } = req.body;
+
+    const record = await PlantAnalysis.findById(req.params.id);
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        message: 'Analysis record not found',
+      });
+    }
+
+    if (status) record.status = status;
+    if (expertNotes !== undefined) record.expertNotes = expertNotes;
+    if (verifiedBy) record.verifiedBy = verifiedBy;
+
+    await record.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Verification status updated successfully',
+      record,
+    });
+  } catch (error) {
+    console.error('Update status error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update verification status',
+    });
+  }
+});
+
+// DELETE /api/plant-analysis/:id - Delete an analysis record
+app.delete('/api/plant-analysis/:id', async (req, res) => {
+  try {
+    const deletedRecord = await PlantAnalysis.findByIdAndDelete(req.params.id);
+
+    if (!deletedRecord) {
+      return res.status(404).json({
+        success: false,
+        message: 'Record not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Plant analysis record deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete plant analysis error:', error.message);
     res.status(500).json({
       success: false,
       message: 'Failed to delete record',

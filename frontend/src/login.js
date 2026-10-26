@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './login.css';
@@ -16,6 +17,7 @@ function Login() {
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('rememberEmail');
+
     if (savedEmail) {
       setFormData((prev) => ({
         ...prev,
@@ -57,15 +59,15 @@ function Login() {
         return;
       }
 
-      if (formData.role && data.user.role !== formData.role) {
+      if (formData.role && data?.user?.role !== formData.role) {
         alert('Selected role does not match your account');
         return;
       }
 
       localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('token', data.token); // important
-      localStorage.setItem('role', data.user.role);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('token', data.token || '');
+      localStorage.setItem('role', data?.user?.role || '');
+      localStorage.setItem('user', JSON.stringify(data.user || {}));
 
       if (formData.remember) {
         localStorage.setItem('rememberEmail', formData.email);
@@ -130,7 +132,7 @@ function Login() {
             >
               <option value="">Select Role</option>
               <option value="admin">Admin</option>
-              <option value="student">student</option>
+              <option value="student">Student</option>
             </select>
 
             <div className="remember-row">
@@ -152,7 +154,11 @@ function Login() {
               </p>
             </div>
 
-            <button type="submit" className="login-btn" disabled={loading}>
+            <button
+              type="submit"
+              className="login-btn"
+              disabled={loading}
+            >
               {loading ? 'Logging in...' : 'Login'}
             </button>
 
@@ -167,3 +173,4 @@ function Login() {
 }
 
 export default Login;
+

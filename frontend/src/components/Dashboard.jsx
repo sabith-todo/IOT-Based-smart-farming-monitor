@@ -15,6 +15,8 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 import L from 'leaflet';
 import FrequencyDashboard from './FrequencyDashboard';
 import LiveWeatherPage from './LiveWeatherPage';
+import PlantAnalysisUpload from './PlantAnalysisUpload';
+import PlantAnalysisHistory from './PlantAnalysisHistory';
 
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free';
@@ -290,7 +292,15 @@ const OverviewPage = ({
     <>
       <div className="top-nav">
         <div>
-          <h1 style={{ margin: 0, fontSize: '28px' }}>SMART FARMING CONTROL CENTER</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <span style={{ fontSize: '24px' }}>🌿</span>
+            <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#f0fdf4' }}>
+              SMART TEA PLANTATION AIoT CONSOLE
+            </h1>
+          </div>
+          <div style={{ color: '#94a3b8', fontSize: '13px', marginBottom: '8px' }}>
+            Estate Block Telemetry • Camellia Sinensis Canopy Analytics • Agronomy Diagnostic Queue
+          </div>
           <span
             className="badge"
             style={{
@@ -363,6 +373,200 @@ const OverviewPage = ({
           <button className="btn-main" style={{ background: '#7c3aed' }} onClick={clearDrawTools}>
             CLEAR TOOLS
           </button>
+        </div>
+      </div>
+
+      {/* Tea Plantation Quick Action CTAs & Phase 1 Prioritized Workflows */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '14px',
+          marginBottom: '20px',
+        }}
+      >
+        <Link
+          to="/dashboard/plant-analysis"
+          style={{
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 78, 59, 0.35))',
+            border: '1px solid rgba(16, 185, 129, 0.4)',
+            borderRadius: '12px',
+            padding: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            textDecoration: 'none',
+            color: '#fff',
+            transition: 'transform 0.15s, border-color 0.15s',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '28px',
+              background: 'rgba(16, 185, 129, 0.25)',
+              padding: '10px',
+              borderRadius: '10px',
+              lineHeight: 1,
+            }}
+          >
+            📸
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '15px', color: '#f0fdf4' }}>
+              Leaf Health & AI Upload
+            </div>
+            <div style={{ fontSize: '12px', color: '#a7f3d0', marginTop: '2px' }}>
+              Scan foliage, tag sector, & queue for diagnostic
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          to="/dashboard/history"
+          style={{
+            background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(14, 116, 144, 0.25))',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
+            borderRadius: '12px',
+            padding: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            textDecoration: 'none',
+            color: '#fff',
+            transition: 'transform 0.15s',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '28px',
+              background: 'rgba(56, 189, 248, 0.2)',
+              padding: '10px',
+              borderRadius: '10px',
+              lineHeight: 1,
+            }}
+          >
+            📋
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '15px', color: '#f0fdf4' }}>
+              Analysis History & Records
+            </div>
+            <div style={{ fontSize: '12px', color: '#bae6fd', marginTop: '2px' }}>
+              Review specimen logs & agronomist audits
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          to="/dashboard/irrigation"
+          style={{
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(180, 83, 9, 0.25))',
+            border: '1px solid rgba(245, 158, 11, 0.35)',
+            borderRadius: '12px',
+            padding: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            textDecoration: 'none',
+            color: '#fff',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '28px',
+              background: 'rgba(245, 158, 11, 0.2)',
+              padding: '10px',
+              borderRadius: '10px',
+              lineHeight: 1,
+            }}
+          >
+            💧
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '15px', color: '#f0fdf4' }}>
+              Misting & Irrigation
+            </div>
+            <div style={{ fontSize: '12px', color: '#fde68a', marginTop: '2px' }}>
+              Soil moisture telemetry & solenoid state
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Tea Estate Agronomic Telemetry Banner */}
+      <div
+        style={{
+          background: '#0a1610',
+          border: '1px solid rgba(52, 211, 153, 0.25)',
+          borderRadius: '12px',
+          padding: '14px 18px',
+          marginBottom: '20px',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '16px',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div>
+            <span style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Soil pH (Tea Target: 4.5 – 5.5)
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+              <span style={{ fontSize: '17px', fontWeight: 700, color: '#f0fdf4' }}>
+                {activeScan.ph || '5.20'}
+              </span>
+              <span
+                style={{
+                  background:
+                    Number(activeScan.ph || 5.2) >= 4.5 && Number(activeScan.ph || 5.2) <= 5.5
+                      ? 'rgba(34, 197, 94, 0.2)'
+                      : Number(activeScan.ph || 5.2) > 6.0
+                      ? 'rgba(239, 68, 68, 0.2)'
+                      : 'rgba(245, 158, 11, 0.2)',
+                  color:
+                    Number(activeScan.ph || 5.2) >= 4.5 && Number(activeScan.ph || 5.2) <= 5.5
+                      ? '#4ade80'
+                      : Number(activeScan.ph || 5.2) > 6.0
+                      ? '#fca5a5'
+                      : '#fde68a',
+                  padding: '2px 8px',
+                  borderRadius: '999px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                }}
+              >
+                {Number(activeScan.ph || 5.2) >= 4.5 && Number(activeScan.ph || 5.2) <= 5.5
+                  ? 'Optimal Acidic Tea Loam'
+                  : Number(activeScan.ph || 5.2) > 6.0
+                  ? 'Alkaline Stress — Acidify'
+                  : 'Acidic Loam (Monitor)'}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <span style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Estate Elevation Microclimate
+            </span>
+            <div style={{ fontSize: '15px', fontWeight: 600, color: '#e2e8f0', marginTop: '2px' }}>
+              1,450m ASL • Mist Canopy Active
+            </div>
+          </div>
+
+          <div>
+            <span style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Relative Humidity Target (75–90%)
+            </span>
+            <div style={{ fontSize: '15px', fontWeight: 600, color: '#38bdf8', marginTop: '2px' }}>
+              {activeScan.humidity || 82}% RH
+            </div>
+          </div>
+        </div>
+
+        <div style={{ fontSize: '12px', color: '#a7f3d0', fontFamily: 'monospace' }}>
+          📍 Plantation Center: 11.0168° N, 76.9558° E
         </div>
       </div>
 
@@ -1090,6 +1294,14 @@ const Dashboard = () => {
   const [archiveSearch, setArchiveSearch] = useState('');
   const [autoScan, setAutoScan] = useState(false);
   const [lastUpdated, setLastUpdated] = useState('--');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const currentUser = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || '{}');
+    } catch {
+      return {};
+    }
+  }, []);
 
   const [weatherPanel, setWeatherPanel] = useState(DEFAULT_WEATHER_PANEL);
   const [weatherLoading, setWeatherLoading] = useState(false);
@@ -1667,6 +1879,38 @@ const Dashboard = () => {
           color: #6e7681;
         }
 
+        .nav-category {
+          font-size: 11px;
+          font-weight: 700;
+          color: #6ee7b7;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+          padding: 14px 10px 6px;
+        }
+
+        .mobile-header {
+          display: none;
+          background: #08120e;
+          border-bottom: 1px solid rgba(52, 211, 153, 0.2);
+          padding: 14px 20px;
+          justify-content: space-between;
+          align-items: center;
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+        }
+
+        .mobile-toggle-btn {
+          background: #12281e;
+          border: 1px solid rgba(52, 211, 153, 0.35);
+          color: #a7f3d0;
+          padding: 6px 14px;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
         @media (max-width: 1100px) {
           .weather-split {
             grid-template-columns: 1fr !important;
@@ -1678,48 +1922,173 @@ const Dashboard = () => {
             flex-direction: column;
           }
 
+          .mobile-header {
+            display: flex;
+          }
+
           .side-panel {
+            display: none;
             width: 100%;
             border-right: none;
             border-bottom: 1px solid #30363d;
           }
 
+          .side-panel.open {
+            display: flex;
+            animation: slideDown 0.2s ease-out;
+          }
+
           .viewport {
-            padding: 18px;
+            padding: 16px;
           }
         }
       `}</style>
 
-      <aside className="side-panel">
-        <div className="brand-box">
-          <h2 style={{ color: '#58a6ff', margin: '0 0 10px 0' }}>🛰️ SMART_FARM PRO</h2>
-          <div style={{ fontSize: '12px', color: '#8b949e' }}>
-            Real-time monitoring, irrigation simulation, rain intelligence, weekly reporting, advanced analytics, and live weather.
+      {/* Mobile Top App Bar */}
+      <div className="mobile-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '22px' }}>🌿</span>
+          <div>
+            <div style={{ fontWeight: 800, color: '#f0fdf4', fontSize: '15px' }}>
+              TEA_AIoT PLATFORM
+            </div>
+            <div style={{ fontSize: '10px', color: '#6ee7b7' }}>Camellia Sinensis Suite</div>
           </div>
         </div>
 
-        <Link to="/dashboard" className="nav-btn">📊 Overview</Link>
-        <Link to="/dashboard/irrigation" className="nav-btn">💧 Irrigation Control</Link>
-        <Link to="/dashboard/weather" className="nav-btn">🌦 Weather Intelligence</Link>
-        <Link to="/dashboard/live-weather" className="nav-btn">⛈ Live Weather</Link>
-        <Link to="/dashboard/report" className="nav-btn">📝 Weekly Report</Link>
-        <Link to="/dashboard/archive" className="nav-btn">📂 Data Archive</Link>
-        <Link to="/dashboard/frequency" className="nav-btn">📶 Frequency Dashboard</Link>
-        <Link to="/dashboard/advanced" className="nav-btn">🚀 Advanced Analytics</Link>
-        <Link to="/dashboard/dashboard2" className="nav-btn">🧠 Dashboard 2</Link>
-
         <button
-          className="btn-main"
-          style={{ marginTop: '20px', background: '#dc2626' }}
-          onClick={logoutUser}
+          type="button"
+          onClick={() => setMobileNavOpen((prev) => !prev)}
+          className="mobile-toggle-btn"
         >
-          Logout
+          {mobileNavOpen ? '✕ Close Menu' : '☰ Estate Menu'}
         </button>
+      </div>
 
-        <div style={{ marginTop: 'auto', fontSize: '11px', color: '#6e7681' }}>
-          MAP: {mapType.toUpperCase()}
-          <br />
-          VERSION: 8.0
+      <aside className={`side-panel ${mobileNavOpen ? 'open' : ''}`}>
+        <div className="brand-box" style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 78, 59, 0.35))', borderColor: 'rgba(52, 211, 153, 0.3)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+            <span style={{ fontSize: '22px' }}>🌿</span>
+            <h2 style={{ color: '#f0fdf4', margin: 0, fontSize: '18px', fontWeight: 800 }}>TEA_AIoT PRO</h2>
+          </div>
+          <div style={{ fontSize: '11px', color: '#a7f3d0', lineHeight: 1.4 }}>
+            Camellia Sinensis Telemetry • Canopy Health • Agronomy Diagnosis
+          </div>
+        </div>
+
+        {/* SECTION 1: CROP HEALTH & DIAGNOSTICS (HIGH PRIORITY) */}
+        <div className="nav-category">🍵 Crop Health & AI Scan</div>
+        <Link
+          to="/dashboard"
+          onClick={() => setMobileNavOpen(false)}
+          className="nav-btn"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        >
+          <span>📊 Estate Overview</span>
+          <span style={{ fontSize: '10px', background: 'rgba(52, 211, 153, 0.2)', color: '#6ee7b7', padding: '2px 6px', borderRadius: '4px' }}>Live</span>
+        </Link>
+        <Link
+          to="/dashboard/plant-analysis"
+          onClick={() => setMobileNavOpen(false)}
+          className="nav-btn"
+          style={{
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 78, 59, 0.35))',
+            borderColor: 'rgba(52, 211, 153, 0.4)',
+            color: '#f0fdf4',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span>📸 Leaf Scan & AI Diagnostic</span>
+          <span style={{ fontSize: '10px', background: '#059669', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Phase 1</span>
+        </Link>
+        <Link
+          to="/dashboard/history"
+          onClick={() => setMobileNavOpen(false)}
+          className="nav-btn"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        >
+          <span>📋 Analysis Records & History</span>
+          <span style={{ fontSize: '10px', background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', padding: '2px 6px', borderRadius: '4px' }}>Queue</span>
+        </Link>
+
+        {/* SECTION 2: ESTATE OPERATIONS */}
+        <div className="nav-category">⚙️ Estate Operations</div>
+        <Link to="/dashboard/irrigation" onClick={() => setMobileNavOpen(false)} className="nav-btn">
+          💧 Misting & Irrigation Control
+        </Link>
+        <Link to="/dashboard/weather" onClick={() => setMobileNavOpen(false)} className="nav-btn">
+          🌦 Weather Intelligence
+        </Link>
+        <Link to="/dashboard/live-weather" onClick={() => setMobileNavOpen(false)} className="nav-btn">
+          ⛈ Live Weather Station
+        </Link>
+        <Link to="/dashboard/frequency" onClick={() => setMobileNavOpen(false)} className="nav-btn">
+          📶 Frequency Telemetry
+        </Link>
+
+        {/* SECTION 3: AGRONOMY & ARCHIVE */}
+        <div className="nav-category">📈 Agronomy & Archive</div>
+        <Link to="/dashboard/report" onClick={() => setMobileNavOpen(false)} className="nav-btn">
+          📝 Weekly Agronomy Report
+        </Link>
+        <Link to="/dashboard/archive" onClick={() => setMobileNavOpen(false)} className="nav-btn">
+          📂 Sensor Data Archive
+        </Link>
+        <Link to="/dashboard/advanced" onClick={() => setMobileNavOpen(false)} className="nav-btn">
+          🚀 Advanced Analytics
+        </Link>
+        <Link to="/dashboard/dashboard2" onClick={() => setMobileNavOpen(false)} className="nav-btn">
+          🧠 Secondary Matrix
+        </Link>
+
+        {/* USER PROFILE CARD */}
+        <div
+          style={{
+            marginTop: 'auto',
+            paddingTop: '16px',
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          <div
+            style={{
+              background: '#07100b',
+              border: '1px solid rgba(52, 211, 153, 0.15)',
+              borderRadius: '10px',
+              padding: '10px 12px',
+              marginBottom: '10px',
+            }}
+          >
+            <div style={{ fontSize: '11px', color: '#6ee7b7', fontWeight: 600 }}>OPERATOR ACCOUNT</div>
+            <div
+              style={{
+                fontSize: '12px',
+                color: '#e2e8f0',
+                marginTop: '2px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {currentUser?.email || localStorage.getItem('userEmail') || 'sabithtodo@gmail.com'}
+            </div>
+            <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>
+              Role: <span style={{ color: '#fbbf24', textTransform: 'capitalize' }}>{currentUser?.role || 'Agronomist'}</span>
+            </div>
+          </div>
+
+          <button
+            className="btn-main"
+            style={{ width: '100%', background: '#dc2626', padding: '9px 12px', fontSize: '12px' }}
+            onClick={logoutUser}
+          >
+            Sign Out
+          </button>
+
+          <div style={{ marginTop: '10px', fontSize: '10px', color: '#64748b', textAlign: 'center' }}>
+            MAP: {mapType.toUpperCase()} • TEA_AIOT v1.2
+          </div>
         </div>
       </aside>
 
@@ -1834,6 +2203,16 @@ const Dashboard = () => {
         farmHealthScore={farmHealthScore}
       />
     }
+  />
+
+  <Route
+    path="/plant-analysis"
+    element={<PlantAnalysisUpload gps={gps} />}
+  />
+
+  <Route
+    path="/history"
+    element={<PlantAnalysisHistory />}
   />
 
   <Route

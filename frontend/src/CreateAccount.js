@@ -130,7 +130,8 @@ function CreateAccount() {
               onChange={handleChange}
               required
             >
-              <option value="student">User</option>
+             
+              <option value="student">Student</option>
               <option value="admin">Admin</option>
             </select>
 
